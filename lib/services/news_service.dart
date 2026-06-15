@@ -4,9 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/article.dart';
 
 class NewsService {
-  // Get your FREE API key from https://newsapi.org (takes 1 minute)
-  static const String _apiKey = 'c0933d6ddb7c4fac83fac69e6652a9cf';
-  static const String _baseUrl = 'https://newsapi.org/v2';
   static const List<String> categories = [
     'Technology',
     'AI',
@@ -31,11 +28,10 @@ class NewsService {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-        final List articles = data['articles'] ?? [];
+        final List articles = jsonDecode(response.body) as List;
 
         final parsedArticles = articles
-            .where((a) => a['title'] != '[Removed]' && a['title'] != null)
+            .where((a) => a['title'] != null)
             .where((a) => (a['url'] ?? '').toString().isNotEmpty)
             .map((a) => Article.fromJson(a))
             .toList();
@@ -43,7 +39,7 @@ class NewsService {
         await _saveCachedArticles(cacheKey, parsedArticles);
         return parsedArticles;
       } else {
-        throw Exception('Failed to load news: ${response.statusCode}');
+        return await _loadCachedArticles(cacheKey);
       }
     } catch (e) {
       final cachedArticles = await _loadCachedArticles(cacheKey);
@@ -53,44 +49,25 @@ class NewsService {
   }
 
   Uri _buildUrl({required String category, required String query}) {
-    if (query.isEmpty && _usesTopHeadlines(category)) {
-      return Uri.parse('$_baseUrl/top-headlines').replace(queryParameters: {
-        'category': category.toLowerCase(),
-        'language': 'en',
-        'pageSize': '30',
-        'apiKey': _apiKey,
-      });
+    if (query.isNotEmpty) {
+      return Uri.parse(
+        'https://dev.to/api/articles?tag=$query&per_page=30',
+      );
     }
-
-    final topic = _topicForCategory(category);
-    final searchTerm = query.isEmpty ? topic : '$query $topic';
-
-    return Uri.parse('$_baseUrl/everything').replace(queryParameters: {
-      'q': searchTerm,
-      'language': 'en',
-      'sortBy': 'publishedAt',
-      'pageSize': '30',
-      'apiKey': _apiKey,
-    });
+    final tag = _devToTagFor(category);
+    return Uri.parse(
+      'https://dev.to/api/articles?tag=$tag&per_page=30',
+    );
   }
 
-  bool _usesTopHeadlines(String category) {
-    return category == 'Technology' || category == 'Science';
-  }
-
-  String _topicForCategory(String category) {
+  String _devToTagFor(String category) {
     switch (category) {
-      case 'AI':
-        return 'artificial intelligence';
-      case 'Crypto':
-        return 'cryptocurrency';
-      case 'Science':
-        return 'science';
-      case 'Gaming':
-        return 'gaming';
+      case 'AI': return 'ai';
+      case 'Crypto': return 'blockchain';
+      case 'Science': return 'science';
+      case 'Gaming': return 'gaming';
       case 'Technology':
-      default:
-        return 'technology';
+      default: return 'technology';
     }
   }
 

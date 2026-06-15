@@ -54,7 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundColor: colorScheme.primary.withValues(alpha: 0.14),
+                backgroundColor: colorScheme.primary.withOpacity(0.14),
                 child: Text(
                   (user?.email?.isNotEmpty ?? false)
                       ? user!.email![0].toUpperCase()
@@ -84,7 +84,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: colorScheme.onSurface.withValues(alpha: 0.64),
+                        color: colorScheme.onSurface.withOpacity(0.64),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Developed by Adarsh Agrawal',
+                      style: TextStyle(
+                        color: colorScheme.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -136,7 +145,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: OutlinedButton.styleFrom(
               foregroundColor: colorScheme.error,
               side: BorderSide(
-                color: colorScheme.error.withValues(alpha: 0.32),
+                color: colorScheme.error.withOpacity(0.32),
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),

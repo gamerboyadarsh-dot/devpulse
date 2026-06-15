@@ -17,15 +17,15 @@ class Article {
 
   // Converts raw JSON from the API into an Article object
   factory Article.fromJson(Map<String, dynamic> json) {
-    return Article(
-      title: json['title'] ?? 'No Title',
-      description: json['description'] ?? 'No description available.',
-      url: json['url'] ?? '',
-      imageUrl: json['urlToImage'] ?? '',
-      source: json['source']?['name'] ?? 'Unknown',
-      publishedAt: json['publishedAt'] ?? '',
-    );
-  }
+  return Article(
+    title: json['title'] ?? 'No Title',
+    description: json['description'] ?? json['tag_list']?.toString() ?? '',
+    url: json['url'] ?? '',
+    imageUrl: json['cover_image'] ?? json['social_image'] ?? '',
+    source: json['user']?['name'] ?? 'dev.to',
+    publishedAt: json['published_at'] ?? '',
+  );
+}
 
   // Converts Article to a Map so Firestore can store it
   Map<String, dynamic> toMap() {

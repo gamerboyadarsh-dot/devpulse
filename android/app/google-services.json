@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "691170170434",
+    "project_id": "devpulse-af21b",
+    "storage_bucket": "devpulse-af21b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:691170170434:android:7c553f8096f1e85f57ffdb",
+        "android_client_info": {
+          "package_name": "com.example.devpulse"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "691170170434-77b092o0ulibelk6ukuqqc3lrmiasoqq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDY5ye5F_kMmbk26SC23Sh44drZDXOju8A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "691170170434-77b092o0ulibelk6ukuqqc3lrmiasoqq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

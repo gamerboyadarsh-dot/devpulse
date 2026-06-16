@@ -1,31 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+
+import '../core/errors/app_exception.dart';
+import '../data/repositories/news_repository.dart';
 import '../models/article.dart';
+import '../providers/repository_providers.dart';
 import '../providers/theme_provider.dart';
-import '../services/news_service.dart';
 import '../widgets/article_card.dart';
 import '../widgets/shimmer_card.dart';
 import 'article_detail_screen.dart';
 import 'bookmarks_screen.dart';
 import 'profile_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  final _newsService = NewsService();
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _searchController = TextEditingController();
 
   List<Article> _articles = [];
   bool _isLoading = true;
   String? _error;
-  String _selectedCategory = NewsService.categories.first;
+  String _selectedCategory = NewsRepository.categories.first;
   int _selectedIndex = 0;
   int _bookmarksRefreshSeed = 0;
   int _profileRefreshSeed = 0;
@@ -50,10 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
-      final articles = await _newsService.fetchArticles(
-        category: _selectedCategory,
-        query: _searchController.text,
-      );
+      final articles = await ref.read(newsRepositoryProvider).fetchArticles(
+            category: _selectedCategory,
+            query: _searchController.text,
+          );
       if (!mounted) return;
       setState(() {
         _articles = articles;
@@ -62,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        _error = userMessageFrom(e);
         _isLoading = false;
       });
     }
@@ -109,6 +111,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final titles = ['DevPulse', 'Bookmarks', 'Profile'];
+    final isDarkMode = ref.watch(isDarkModeProvider);
+    final themeNotifier = ref.read(themeNotifierProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -120,18 +124,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          Consumer<ThemeProvider>(
-            builder: (context, themeProvider, _) {
-              return IconButton(
-                tooltip: themeProvider.isDarkMode ? 'Light mode' : 'Dark mode',
-                icon: Icon(
-                  themeProvider.isDarkMode
-                      ? Icons.light_mode_rounded
-                      : Icons.dark_mode_rounded,
-                ),
-                onPressed: themeProvider.toggleTheme,
-              );
-            },
+          IconButton(
+            tooltip: isDarkMode ? 'Light mode' : 'Dark mode',
+            icon: Icon(
+              isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+            ),
+            onPressed: themeNotifier.toggleTheme,
           ),
         ],
       ),
@@ -190,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     if (_error != null) {
-      return _ErrorState(onRetry: _loadNews);
+      return _ErrorState(message: _error!, onRetry: _loadNews);
     }
 
     final articles = _filteredArticles;
@@ -277,10 +275,10 @@ class _CategoryBar extends StatelessWidget {
       height: 40,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: NewsService.categories.length,
+        itemCount: NewsRepository.categories.length,
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
-          final category = NewsService.categories[index];
+          final category = NewsRepository.categories[index];
           return ChoiceChip(
             label: Text(category),
             selected: selectedCategory == category,
@@ -293,9 +291,13 @@ class _CategoryBar extends StatelessWidget {
 }
 
 class _ErrorState extends StatelessWidget {
+  final String message;
   final VoidCallback onRetry;
 
-  const _ErrorState({required this.onRetry});
+  const _ErrorState({
+    required this.message,
+    required this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -314,6 +316,15 @@ class _ErrorState extends StatelessWidget {
               style: GoogleFonts.inter(
                 color: colorScheme.onSurface.withValues(alpha: 0.64),
                 fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: colorScheme.onSurface.withValues(alpha: 0.52),
+                fontSize: 13,
               ),
             ),
             const SizedBox(height: 10),

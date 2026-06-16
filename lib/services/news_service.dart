@@ -1,6 +1,9 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../core/config/app_config.dart';
 import '../models/article.dart';
 
 class NewsService {
@@ -44,30 +47,32 @@ class NewsService {
     } catch (e) {
       final cachedArticles = await _loadCachedArticles(cacheKey);
       if (cachedArticles.isNotEmpty) return cachedArticles;
-      throw Exception('Network error: $e');
+      rethrow;
     }
   }
 
   Uri _buildUrl({required String category, required String query}) {
+    final base = AppConfig.devToApiBase;
     if (query.isNotEmpty) {
-      return Uri.parse(
-        'https://dev.to/api/articles?tag=$query&per_page=30',
-      );
+      return Uri.parse('$base/articles?tag=$query&per_page=30');
     }
     final tag = _devToTagFor(category);
-    return Uri.parse(
-      'https://dev.to/api/articles?tag=$tag&per_page=30',
-    );
+    return Uri.parse('$base/articles?tag=$tag&per_page=30');
   }
 
   String _devToTagFor(String category) {
     switch (category) {
-      case 'AI': return 'ai';
-      case 'Crypto': return 'blockchain';
-      case 'Science': return 'science';
-      case 'Gaming': return 'gaming';
+      case 'AI':
+        return 'ai';
+      case 'Crypto':
+        return 'blockchain';
+      case 'Science':
+        return 'science';
+      case 'Gaming':
+        return 'gaming';
       case 'Technology':
-      default: return 'technology';
+      default:
+        return 'technology';
     }
   }
 

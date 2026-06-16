@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../services/auth_service.dart';
-import 'home_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+import '../core/errors/app_exception.dart';
+import '../providers/repository_providers.dart';
+
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _authService = AuthService();
 
   bool _isLogin = true;
   bool _isLoading = false;
@@ -37,19 +38,14 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
+      final authRepository = ref.read(authRepositoryProvider);
       if (_isLogin) {
-        await _authService.signIn(email, password);
+        await authRepository.signIn(email, password);
       } else {
-        await _authService.signUp(email, password);
+        await authRepository.signUp(email, password);
       }
-
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
     } catch (e) {
-      _showError(e.toString());
+      _showError(userMessageFrom(e));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

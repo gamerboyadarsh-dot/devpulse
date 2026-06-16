@@ -6,14 +6,27 @@ HEAD
 **Live Demo:** https://devpulse-af21b.web.app
 
 ---
+VideoLink:https://youtu.be/rlaa3ziBjO0
 
 ## Screenshots
+
 
 > *(Add screenshots here after taking them — Win + G to record screen)*
 
 ---
 
-## Features
+
+
+
+
+<img width="1920" height="1080" alt="Screenshot (598)" src="https://github.com/user-attachments/assets/eb0816da-8c0b-4132-ad53-98e45136a4a8" />
+
+<img width="1920" height="1080" alt="Screenshot (601)" src="https://github.com/user-attachments/assets/1ce137d0-96ba-4c17-bcbb-55376316cc64" />
+
+<img width="1920" height="1080" alt="Screenshot (598)" src="https://github.com/user-attachments/assets/f2a245e8-569d-4a78-ba5c-5230290efb50" />
+
+<img width="1920" height="1080" alt="Screenshot (600)" src="https://github.com/user-attachments/assets/d9f9d44e-0dec-4552-b6f6-ab52fc99cc89" />
+#Feautures
 
 - 🔐 Email/Password Authentication (Firebase Auth)
 - 📰 Live tech news feed via GNews API
@@ -101,9 +114,9 @@ flutter pub get
 flutterfire configure
 ```
 
-### 4. Add GNews API key
-- Get free key at [gnews.io](https://gnews.io)
-- Replace `YOUR_GNEWS_KEY_HERE` in `lib/services/news_service.dart`
+### 4. Add dev API key
+- Get free key at 
+
 
 ### 5. Run the app
 ```bash
